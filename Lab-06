@@ -1,0 +1,82 @@
+#include <iostream>
+#include <fstream>
+#include <sstream>
+using namespace std;
+
+struct Node {
+    string ip;
+    Node* prev;
+    Node* next;
+    Node(string address) {
+        ip = address;
+        prev = next = nullptr;
+    }
+};
+
+void insertNode(Node*& head, Node*& tail, const string& ip) {
+    Node* n = new Node(ip);
+    if (!head) head = tail = n;
+    else {
+        tail->next = n;
+        n->prev = tail;
+        tail = n;
+    }
+}
+
+void displayForward(Node* head) {
+    cout << "Forward traversal:\n";
+    for (Node* t = head; t; t = t->next) {
+        cout << t->ip;
+        if (t->next) cout << " -> ";
+    }
+    cout << endl;
+}
+
+void displayBackward(Node* tail) {
+    cout << "\nBackward traversal:\n";
+    for (Node* t = tail; t; t = t->prev) {
+        cout << t->ip;
+        if (t->prev) cout << " -> ";
+    }
+    cout << endl;
+}
+
+void freeList(Node*& head) {
+    while (head) {
+        Node* t = head;
+        head = head->next;
+        delete t;
+    }
+}
+
+int main() {
+    ifstream file("ips.txt");
+    if (!file.is_open()) {
+        cout << "Error: Could not open ips.txt" << endl;
+        return 0;
+    }
+
+    string line;
+    getline(file, line);
+    file.close();
+
+    if (line.empty()) {
+        cout << "File is empty!" << endl;
+        return 0;
+    }
+
+    Node* head = nullptr;
+    Node* tail = nullptr;
+
+    stringstream ss(line);
+    string ip;
+    while (getline(ss, ip, ',')) {
+        if (!ip.empty()) insertNode(head, tail, ip);
+    }
+
+    displayForward(head);
+    displayBackward(tail);
+    freeList(head);
+
+    return 0;
+}
