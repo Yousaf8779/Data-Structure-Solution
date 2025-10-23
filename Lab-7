@@ -1,0 +1,179 @@
+#include <iostream>
+#include <iomanip>
+using namespace std;
+
+class Node {
+public:
+    int data;
+    Node* next;
+    Node* prev;
+
+    Node(int value) {
+        data = value;
+        next = nullptr;
+        prev = nullptr;
+    }
+};
+
+class DLL {
+public:
+    Node* head;
+    Node* tail;
+
+    DLL() {
+        head = nullptr;
+        tail = nullptr;
+    }
+
+    ~DLL() {
+        Node* current = head;
+        while (current != nullptr) {
+            Node* nextNode = current->next;
+            delete current;
+            current = nextNode;
+        }
+        head = nullptr;
+        tail = nullptr;
+    }
+
+    void display() {
+        Node* current = head;
+        if (current == nullptr) {
+            cout << "List is Empty" << endl;
+            return;
+        }
+        while (current != nullptr) {
+            cout << current->data << " ";
+            current = current->next;
+        }
+        cout << endl;
+    }
+
+    void Display() {
+        Node* temp = head;
+        cout << "\n------------------------------------------------------\n";
+        cout << "     Prev Address        |   Data   |     Next Address |   Node Address\n";
+        cout << "------------------------------------------------------\n";
+        while (temp != nullptr) {
+            cout << setw(20) << temp->prev
+                 << " | " << setw(7) << temp->data
+                 << " | " << setw(18) << temp->next
+                 << " | " << setw(20) << temp << endl;
+            temp = temp->next;
+        }
+        cout << endl << "Tail: " << tail << endl;
+        cout << "------------------------------------------------------\n";
+    }
+
+    void insertAtBegin(int value) {
+        Node* newNode = new Node(value);
+        newNode->next = head;
+        if (head != nullptr)
+            head->prev = newNode;
+        head = newNode;
+        if (tail == nullptr)
+            tail = newNode;
+    }
+
+    void insertAtPos(int position, int value) {
+        if (position < 1) {
+            cout << "Invalid position!" << endl;
+            return;
+        }
+        if (position == 1 || head == nullptr) {
+            insertAtBegin(value);
+            return;
+        }
+        Node* current = head;
+        for (int i = 1; i < position - 1 && current->next != nullptr; i++) {
+            current = current->next;
+        }
+        if (current == tail) {
+            insertAtEnd(value);
+            return;
+        }
+        Node* newNode = new Node(value);
+        newNode->next = current->next;
+        newNode->prev = current;
+        current->next->prev = newNode;
+        current->next = newNode;
+    }
+
+    void insertAtEnd(int value) {
+        Node* newNode = new Node(value);
+        if (tail == nullptr) {
+            head = tail = newNode;
+            return;
+        }
+        tail->next = newNode;
+        newNode->prev = tail;
+        tail = newNode;
+    }
+
+    void deleteFB() {
+        if (head == nullptr) {
+            cout << "List is Empty" << endl;
+            return;
+        }
+        Node* temp = head;
+        if (head->next == nullptr) {
+            head = tail = nullptr;
+        } else {
+            head = head->next;
+            head->prev = nullptr;
+        }
+        delete temp;
+        cout << "First node deleted successfully!\n";
+    }
+
+    void DisplayNode(Node* node) {
+        if (node == nullptr) {
+            cout << "Node not found!" << endl;
+            return;
+        }
+        cout << "\n------------------------------------------------------\n";
+        cout << "     Prev Address        |   Data   |     Next Address |   Node Address\n";
+        cout << "------------------------------------------------------\n";
+        cout << setw(20) << node->prev
+             << " | " << setw(7) << node->data
+             << " | " << setw(18) << node->next
+             << " | " << setw(20) << node << endl;
+        cout << "------------------------------------------------------\n";
+    }
+
+    void search(int value) {
+        Node* current = head;
+        while (current != nullptr) {
+            if (current->data == value) {
+                cout << "Node found...\n";
+                DisplayNode(current);
+                return;
+            }
+            current = current->next;
+        }
+        cout << "Node not found!\n";
+    }
+};
+
+int main() {
+    DLL list;
+    list.insertAtEnd(10);
+    list.insertAtEnd(20);
+    list.insertAtEnd(30);
+    list.insertAtEnd(40);
+
+    cout << "Initial List:\n";
+    list.display();
+
+    list.insertAtPos(3, 25);
+    cout << "After inserting 25 at position 3:\n";
+    list.display();
+
+    list.deleteFB();
+    cout << "After deleting first node:\n";
+    list.display();
+
+    list.search(30);
+
+    return 0;
+}
